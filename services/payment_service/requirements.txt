@@ -26,3 +26,4 @@ pyjwt[crypto]==2.8.0
 okta_jwt_verifier
 jwcrypto
 python-multipart
+aiokafka==0.8.0

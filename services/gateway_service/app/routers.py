@@ -10,6 +10,7 @@ from schemas.responses import ResponsesEnum
 from config.config import get_settings
 
 from validator import Validator
+from producer import KafkaProducer
 
 router = APIRouter(prefix='', tags=['Gateway API'])
 settings = get_settings()
@@ -17,6 +18,7 @@ settings = get_settings()
 
 @router.get('/manage/health', status_code=status.HTTP_200_OK)
 async def check_availability():
+    await KafkaProducer.send()
     return Response(status_code=status.HTTP_200_OK)
 
 

@@ -52,6 +52,7 @@ jobs:
     name: Deploy services in kuber claster
     needs: [deploy]
     runs-on: ubuntu-latest
+    steps:
       - name: Install Helm
         uses: azure/setup-helm@v3
  

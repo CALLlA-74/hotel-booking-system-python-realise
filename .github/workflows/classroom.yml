@@ -2,10 +2,10 @@ name: GitHub Classroom Workflow
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
     branches:
-      - main
+      - master
 jobs:
   unit-tests:
     name: Run unit tests
@@ -38,7 +38,7 @@ jobs:
       - uses: docker/setup-buildx-action@v2
       
       - name: Docker build
-        run: docker compose build
+        run: docker-compose build
 
       - name: Docker Hub login
         env:
@@ -46,13 +46,19 @@ jobs:
         run: echo "$CRYANDEX_PASSWORD" | docker login -u oauth --password-stdin cr.yandex
 
       - name: Docker Publish
-        run: docker compose push
+        run: docker-compose push
   
   deploy-in-kuber:
     name: Deploy services in kuber claster
     needs: [deploy]
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - uses: docker/setup-buildx-action@v2
+      
       - name: Install Helm
         uses: azure/setup-helm@v3
  
@@ -68,6 +74,7 @@ jobs:
         run: |
           echo ${{ secrets.CRYANDEX_PASSWORD }} | sudo cp ./services/reservation_service/sql/init_db.sql ./k8s/postgres-chart/reservations-init-db.sql |
           echo ${{ secrets.CRYANDEX_PASSWORD }} | sudo cp ./services/loyalty_service/sql/init_db.sql ./k8s/postgres-chart/loyalties-init-db.sql |
+          echo ${{ secrets.CRYANDEX_PASSWORD }} | sudo cp ./services/identity_provider/sql/init_db.sql ./k8s/postgres-chart/users-init-db.sql |
           helm --kubeconfig ./kube.config upgrade --install db ./k8s/postgres-chart
           
       - name: Deploy app

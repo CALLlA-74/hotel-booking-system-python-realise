@@ -2,6 +2,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 from database.AppDatabase import AppDatabase
+from sqlalchemy.orm import Session
 from routers import router as LoyaltyRouter
 from config.config import get_settings
 import asyncio
@@ -47,7 +48,8 @@ app.include_router(LoyaltyRouter, prefix='')
 app.openapi = get_openapi_schema
 app_db = AppDatabase.app_db
 
-task = asyncio.get_event_loop().create_task(kafka_consumer.consume())
+
+task = asyncio.get_event_loop().create_task(kafka_consumer.consume(app_db))
 
 if __name__ == "__main__":
     app_db.create_all()

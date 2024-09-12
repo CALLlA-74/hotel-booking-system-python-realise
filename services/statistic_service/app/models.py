@@ -1,41 +1,40 @@
-from sqlalchemy import Integer, Column, VARCHAR
-from typing import Final, Any
+from sqlalchemy import FLOAT, Column, VARCHAR
+from typing import Final
 from database.database import Base
-from schemas.dto import LoyaltyInfoResponse
+from schemas.dto import EventInfoResponse
+import datetime
 
 DISCOUNT_BY_STATUS: Final = {'BRONZE': 5, 'SILVER': 7, 'GOLD': 10}  # статусы и размеры скидок в процентах
 
 
-class Loyalty(Base):
-    __tablename__ = 'loyalty'
+class StatisticMsg(Base):
+    __tablename__ = 'statistics'
     __table_args__ = {
         'extend_existing': True
     }
 
-    id = Column(Integer, primary_key=True)
-    username = Column(VARCHAR(80), nullable=False, unique=True)
-    __reservation_count = Column(Integer, nullable=False, default=0, name='reservation_count')
-    __status = Column(VARCHAR(80), nullable=False, default=list(DISCOUNT_BY_STATUS.keys())[0], name='status')
-    __discount = Column(Integer, nullable=False, default=int(DISCOUNT_BY_STATUS[list(DISCOUNT_BY_STATUS.keys())[0]]), name='discount')
+    event_uuid = Column(VARCHAR(), nullable=False, primary_key=True)
+    username = Column(VARCHAR(80), nullable=False)
+    event_action = Column(VARCHAR(80), nullable=False)
+    start_time = Column(FLOAT(), nullable=False)
+    end_time = Column(FLOAT(), nullable=False)
+    service_name = Column(VARCHAR(80), nullable=False)
 
-    def __init__(self, name):
-        self.username = name
+    def __init__(self, event_uuid: str, username: str, event_action: str,
+                 start_time: float, end_time: float, service_name: str):
+        self.event_uuid = event_uuid
+        self.username = username
+        self.event_action = event_action
+        self.start_time = start_time + 3*3600   # GMT+03 dim
+        self.end_time = end_time + 3*3600       # GMT+03 dim
+        self.service_name = service_name
 
-    def get_dto_model(self):
-        return LoyaltyInfoResponse(
-            status=self.__status,
-            discount=self.__discount,
-            reservationCount=self.__reservation_count
+    def get_event_dto(self):
+        return EventInfoResponse(
+            eventUuid=self.event_uuid,
+            username=self.username,
+            eventAction=self.event_action,
+            startTime=str(datetime.datetime.fromtimestamp(self.start_time)),
+            endTime=str(datetime.datetime.fromtimestamp(self.end_time)),
+            serviceName=self.service_name
         )
-
-    def update_reservation_count(self, reservation_count_operation: int):
-        if reservation_count_operation > 0:
-            self.__reservation_count += 1
-        else:
-            self.__reservation_count = max(self.__reservation_count - 1, 0)
-        self.__status = self.get_status_by_reservation_count(self.__reservation_count)
-        self.__discount = DISCOUNT_BY_STATUS[self.__status]
-
-    @staticmethod
-    def get_status_by_reservation_count(reservation_count) -> str:
-        return list(DISCOUNT_BY_STATUS.keys())[min(reservation_count % 100 // 10, 2)]

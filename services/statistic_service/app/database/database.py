@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
 
 Base = declarative_base()
 
@@ -12,7 +12,7 @@ class Database:
         if db_url[:6] != "sqlite":
             self.engine = create_engine(self.DB_URL)
         else:
-            self.engine = create_engine(self.DB_URL, connect_args={"check_same_thread": False})        #
+            self.engine = create_engine(self.DB_URL, connect_args={"check_same_thread": False})
         self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
 
     def create_all(self):
@@ -24,3 +24,7 @@ class Database:
             yield db
         finally:
             db.close_all()
+
+    def get_session(self):
+        for s in self.get_db():
+            return s

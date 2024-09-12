@@ -71,10 +71,12 @@ ALTER TABLE ONLY public.hotels ALTER COLUMN id SET DEFAULT nextval('public.hotel
 --
 
 COPY public.hotels (id, hotel_uid, name, country, city, adress, stars, price) FROM stdin;
-1	049161bb-badd-4fa8-9d90-87c9a82b0668	Ararat Park Hyatt Moscow	Россия	Москва	Неглинная ул., 4	5	10000
+1	049161bb-badd-4fa8-9d90-87c9a82b0668	Jomtien Garden Palace	Thailand	Pattaya	Jomtien st., 69	3	2599
 2	049161bb-badd-4fa8-9d90-87c9a82b0667	Lady Gaga Spa Resort	USA	Los Angeles	Hot Avenue, 28	4	5000
-3	049161bb-badd-4fa8-9d90-87c9a82b0666	Jomtien Grden Palace	Thailand	Pattaya	Jomtien st., 69	3	1000
-4	049161bb-badd-4fa8-9d90-87c9a82b0665	Delphin Botanic Resort	Turkey	Alanya	Chulpan Hamatova, 64	5	2500
+3	049161bb-badd-4fa8-9d90-87c9a82b0666	Cortez Blood Resort	USA	NY	Taylor st., 69	3	3228
+4	049161bb-badd-4fa8-9d90-87c9a82b0665	Delphin Botanic Resort	Turkey	Alanya	Amy Derya st., 64	5	2500
+5	049161bb-badd-4fa8-9d90-87c9a82b0664	Delphin Premium Resort	Turkey	Alanya	Amy Derya st., 65	5	3500
+6	049161bb-badd-4fa8-9d90-87c9a82b0663	Delphin Platinum Resort	Turkey	Alanya	Amy Derya st., 66	5	5500
 \.
 
 

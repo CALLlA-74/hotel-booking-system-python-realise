@@ -86,3 +86,12 @@ class UpdateReservation(BaseModel):
             value,
             "%Y-%m-%d"
         ).date()
+
+
+class EventInfoMsg(BaseModel):
+    eventUuid: str | None = None
+    username: str
+    eventAction: str
+    startTime: float
+    endTime: float
+    serviceName: str

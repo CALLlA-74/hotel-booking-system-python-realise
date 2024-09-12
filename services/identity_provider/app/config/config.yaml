@@ -21,7 +21,7 @@ identity_app:
   num_of_keys: 2
   key_exp: "AQAB"
   host_name: "http://identity-provider:8090/"
-  access_token_exp_period_minutes: 60 # minutes
-  refresh_token_exp_period_days: 30 # days
+  access_token_exp_period_minutes: 5 #60 # minutes
+  refresh_token_exp_period_days: 1 #30 # days
 
 

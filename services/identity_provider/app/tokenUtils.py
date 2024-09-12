@@ -137,7 +137,6 @@ class TokenMaster:
             TokenMaster.__revoke_token(claims=claims, db=db)
             revoked_token = db.query(models.IssuedJWTToken) \
                 .filter(models.IssuedJWTToken._jti == claims['jti']).first()
-            # print("Token was revoked: ", revoked_token._revoked)
 
             user = db.query(models.User).filter(models.User._id == revoked_token._subject).first()
             user = user.get_dto_model()
@@ -185,8 +184,6 @@ class TokenMaster:
             TokenMaster.__verify_signature(token, signature, jwk)
 
             issued_token = db.query(models.IssuedJWTToken).filter(models.IssuedJWTToken._jti == claims['jti']).first()
-            print({issued_token._jti: [issued_token._device_id, issued_token._revoked]})
-            print("==============" * 3)
 
             if issued_token._revoked:
                 db.query(models.IssuedJWTToken).filter(models.IssuedJWTToken._subject == issued_token._subject) \
@@ -208,6 +205,7 @@ class TokenMaster:
             payload = jwt.get_unverified_claims(token)
         except Exception as e:
             print(f"parsing token error: {str(e)}")
+            raise JWTValidationException(f"parsing token error: {str(e)}")
         return header, payload, sign, base64url_decode(sign + '=' * (4 - len(sign) % 4))
 
     @staticmethod
@@ -255,9 +253,9 @@ class TokenMaster:
     def __verify_expiration(payload, leeway=LEEWAY):
         exp = payload["exp"]
         now = int(time.time())
-        print("exp: ", exp)
-        print("now: ", now)
         if exp + leeway < now:
+            print("exp: ", exp)
+            print("now: ", now)
             print("Signature has expired")
             raise JWTValidationException("Signature has expired")
 
@@ -278,7 +276,7 @@ class TokenMaster:
     def __get_jwk(kid: str, db: Session):
         key = db.query(models.JWK).filter(models.JWK._kid == kid).first()
         key = key.to_dict()
-        print(key)
+        #print(key)
         return key
 
     @staticmethod
@@ -302,7 +300,7 @@ class TokenMaster:
 
     @staticmethod
     def schedule_gen_keys(db: Session):
-        print("try to gen keys")
+        #print("check keys")
 
         def gen_keys():
             try:
@@ -326,7 +324,6 @@ class TokenMaster:
                     db.commit()
                     db.refresh(new_key)
                 except Exception as e:
-                    print(e)
                     print(f'Try to create keys: {str(e)}')
 
         keys = list(db.query(models.JWK).all())

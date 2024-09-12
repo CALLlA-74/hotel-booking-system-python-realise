@@ -12,7 +12,7 @@ from database.database import Base
 from schemas.dto import JWK as JWK_dto
 from schemas.dto import UserInfo
 
-ROLES: Final = ['User', 'Admin']
+ROLES: Final = ['user', 'admin']
 settings = config.get_settings()
 
 
@@ -54,7 +54,11 @@ class User(Base):
 
     def verify_password(self, password: str) -> bool:
         _, salt = self.__password_hash.split('.')
-        return self.__password_hash == self.__gen_password_hash(password=password, salt=bytes.fromhex(salt))
+        print("hash from db: ", self.__password_hash)
+        print("got pass hash: ", self.__gen_password_hash(password=password, salt=bytes.fromhex(salt)))
+        res = self.__password_hash == self.__gen_password_hash(password=password, salt=bytes.fromhex(salt))
+        print("password verified? ", res)
+        return res
 
     def get_dto_model(self):
         return UserInfo(
@@ -113,11 +117,11 @@ class JWK(Base):
             'e': self.__e,
             'alg': self.__alg,
         }
-        print(self._kid)
+        """print(self._kid)
         print(key["n"])
         print(key["e"])
         print(key["d"])
-        print('='*10)
+        print('='*10)"""
         return key
 
 

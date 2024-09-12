@@ -20,13 +20,19 @@ async def get_jwks(db: Session):
 
 async def register_user(user_info: RegisterUserRequest, db: Session) -> TokenResponse:
     TokenMaster.schedule_gen_keys(db)
-    new_client = User(username=user_info.username,
-                      password=user_info.password,
-                      first_name=user_info.first_name,
-                      last_name=user_info.last_name,
-                      patronymic=user_info.patronymic,
-                      phone_number=user_info.phone_number,
-                      email=user_info.email)
+    if is_valid(user_info.username) and is_valid(user_info.password) and \
+            is_valid(user_info.first_name) and  is_valid(user_info.last_name) and \
+            is_valid(user_info.phone_number) and is_valid(user_info.email):
+        patronymic = user_info.patronymic if user_info.patronymic else ""
+        new_client = User(username=user_info.username,
+                          password=user_info.password,
+                          first_name=user_info.first_name,
+                          last_name=user_info.last_name,
+                          patronymic=patronymic,
+                          phone_number=user_info.phone_number,
+                          email=user_info.email)
+    else:
+        raise HTTPException(400, detail="Bad request")
     try:
         db.add(new_client)
         db.commit()
@@ -45,8 +51,9 @@ async def auth_user(request: AuthenticationRequest, db: Session) -> TokenRespons
     TokenMaster.schedule_gen_keys(db)
     if request.grant_type == GrantTypes.PASSWORD:
         user = db.query(User).filter(User._username == request.username).first()
+        print("user: ", user)
         if user is None or not user.verify_password(request.password):
-            raise HTTPException(404, "Invalid username or password")
+            raise HTTPException(401, detail="Unauthorized")
         return TokenMaster.generate_signed_tokens(user.get_dto_model(), request.scope, db)
     elif request.grant_type == GrantTypes.REFRESH_TOKEN:
         return TokenMaster.update_tokens(request.refresh_token, request.scope, db)
@@ -56,3 +63,7 @@ async def auth_user(request: AuthenticationRequest, db: Session) -> TokenRespons
 async def logout(refresh_token: str, db: Session) -> None:
     TokenMaster.schedule_gen_keys(db)
     TokenMaster.revoke_token(refresh_token, db)
+
+
+def is_valid(field: str) -> bool:
+    return field and len(field) > 0

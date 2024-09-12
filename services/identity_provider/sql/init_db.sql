@@ -27,13 +27,13 @@ SET default_table_access_method = heap;
 CREATE TABLE public.users (
     id integer NOT NULL,
 	username varchar(80) NOT NULL,
-	password_hash varchar() NOT NULL,
-	role varchar(80) NOT NULL CHECK (role IN ('User', 'Admin')),
+	password_hash varchar NOT NULL,
+	role varchar(80) NOT NULL CHECK (role IN ('user', 'admin')),
 	first_name varchar(80) NOT NULL,
 	last_name varchar(80) NOT NULL,
-	patronymic varchar(80),
+	patronymic varchar(80) DEFAULT '',
 	phone_number varchar(15) NOT NULL,
-	email varchar(), NOT NULL
+	email varchar NOT NULL
 );
 
 
@@ -72,9 +72,10 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: program
 --
 
-/*COPY public.users (id, username, password_hash, role, first_name, last_name, patronymic, phone_number, email) FROM stdin;
-1	username	passw	Admin	name	surname	patronymic	82222222222	username@domain.ru
-\. */
+COPY public.users (id, username, password_hash, role, first_name, last_name, phone_number, email) FROM stdin;
+1	Test Max	33a52b7f827a648f9d6a527cb887c838b68357ffcf94ab257d0f27129709d088.9ab398f7c32c22ad8d056c546653fabc	user	Max	Test	88005553535	test-max@gmall.com
+2	admin	2a6aa69d0c4ffff2cc4dd3115fb3f64c75fdb05523eaa73998c6ae2679d190fc.3f8d325d2367c347649e7a9312bb892b	admin	Admin	Adminov	+79779917395	admin@admin.ru
+\.
 
 
 --

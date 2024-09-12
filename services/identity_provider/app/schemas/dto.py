@@ -50,3 +50,12 @@ class AuthenticationRequest(BaseModel):
     username: str | None = None
     password: str | None = None
     refresh_token: str | None = None
+
+
+class EventInfoMsg(BaseModel):
+    eventUuid: str | None = None
+    username: str
+    eventAction: str
+    startTime: float
+    endTime: float
+    serviceName: str

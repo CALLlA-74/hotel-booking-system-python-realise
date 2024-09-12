@@ -7,7 +7,7 @@ replicaCount: 1
 services:
   loyalty-service:
     name: loyalty-service
-    container: cr.yandex/crpoaqoigck9sge4bf4s/loyalty_service
+    container: cr.yandex/crpl4r9r7vin4r016c40/loyalty_service
     replicaCount: 1
     env:
       DB_DSN: "host=db-service user=program password=test dbname=loyalties port=5432" # add on deploy like ""
@@ -16,7 +16,7 @@ services:
     targetPort: 8050
   payment-service:
     name: payment-service
-    container: cr.yandex/crpoaqoigck9sge4bf4s/payment_service
+    container: cr.yandex/crpl4r9r7vin4r016c40/payment_service
     replicaCount: 1
     env:
       DB_DSN: "host=db-service user=program password=test dbname=payments port=5432" # add on deploy
@@ -25,21 +25,49 @@ services:
     targetPort: 8060
   reservation-service:
     name: reservation-service
-    container: cr.yandex/crpoaqoigck9sge4bf4s/reservation_service
+    container: cr.yandex/crpl4r9r7vin4r016c40/reservation_service
     replicaCount: 1
     env:
       DB_DSN: "host=db-service user=program password=test dbname=reservations port=5432" # add on deploy
     publishUrl: /reservation-service-direct/
     port: 8070
     targetPort: 8070
+  identity-provider:
+    name: identity-provider
+    container: cr.yandex/crpl4r9r7vin4r016c40/identity_provider
+    replicaCount: 1
+    env:
+      DB_DSN: "host=db-service user=program password=test dbname=users port=5432" # add on deploy
+    publishUrl: /identity-provider-direct/
+    port: 8090
+    targetPort: 8090
+  statistic-service:
+    name: statistic-service
+    container: cr.yandex/crpl4r9r7vin4r016c40/statistic_service
+    replicaCount: 1
+    env:
+      DB_DSN: "host=db-service user=program password=test dbname=statistics port=5432" # add on deploy
+    publishUrl: /statistic-service-direct/
+    port: 8040
+    targetPort: 8040
   gateway-service:
     name: gateway-service
-    container: cr.yandex/crpoaqoigck9sge4bf4s/gateway_service
+    container: cr.yandex/crpl4r9r7vin4r016c40/gateway_service
     replicaCount: 1
     env:
       RESERVATION_SERVICE_URL: "http://reservation-service/api/v1/"
       PAYMENT_SERVICE_URL: "http://payment-service/api/v1/"
       LOYALTY_SERVICE_URL: "http://loyalty-service/api/v1/"
-    publishUrl: /
+      IDENTITY_PROVIDER_URL: "http://identity-provider/api/v1/"
+      STATISTIC_SERVICE_URL: "http://statistic-service/api/v1/"
+    publishUrl: /booking-service/
     port: 80
     targetPort: 8080
+  frontend:
+    name: frontend
+    container: cr.yandex/crpl4r9r7vin4r016c40/frontend
+    replicaCount: 1
+    env:
+    publishUrl: /
+    port: 3000
+    targetPort: 3000

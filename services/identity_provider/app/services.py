@@ -39,8 +39,8 @@ async def register_user(user_info: RegisterUserRequest, db: Session) -> TokenRes
         db.refresh(new_client)
     except Exception as e:
         print(e)
-        if 'already exists' in str(e):
-            raise HTTPException(200, detail="OK")
+        """if 'already exists' in str(e):
+            raise HTTPException(200, detail="OK")"""
         raise HTTPException(500, detail="Internal server error")
 
     new_client = new_client.get_dto_model()

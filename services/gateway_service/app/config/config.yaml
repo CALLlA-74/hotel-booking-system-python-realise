@@ -21,3 +21,6 @@ gateway_app:
 
   loyalty_serv_host: "loyalty-service"
   loyalty_serv_port: 8050
+
+  statistic_serv_host: "statistic-service"
+  statistic_serv_port: 8040

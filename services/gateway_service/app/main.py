@@ -1,6 +1,7 @@
 import uvicorn
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
+from fastapi.middleware.cors import CORSMiddleware
 from routers import router as GatewayRouter
 from config.config import get_settings
 
@@ -41,6 +42,13 @@ app = FastAPI(title="OpenAPI definition",
               )
 app.include_router(GatewayRouter, prefix='')
 app.openapi = get_openapi_schema
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 if __name__ == "__main__":
     uvicorn.run('main:app',

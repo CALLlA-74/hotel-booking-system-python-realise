@@ -121,7 +121,15 @@ class ReservationResponse(BaseModel):
         ).date()
 
 
+class UserProfile(BaseModel):
+    name: str
+    surname: str
+    patronymic: str = ""
+    phoneNumber: str
+
+
 class UserInfoResponse(BaseModel):
+    profile: UserProfile
     reservations: List[ReservationResponse]
     loyalty: LoyaltyInfoResponse | Any = {}
 
@@ -212,3 +220,12 @@ class AuthenticationRequest(BaseModel):
     username: str | None = None
     password: str | None = None
     refresh_token: str | None = None
+
+
+class EventInfoMsg(BaseModel):
+    eventUuid: str | None = None
+    username: str
+    eventAction: str
+    startTime: float
+    endTime: float
+    serviceName: str

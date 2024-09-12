@@ -32,7 +32,7 @@ async def get_all_hotels(page: int, size: int, token: str):
     return resp.json()
 
 
-async def get_user_info(token: str):
+async def get_user_info(token: str, userinfo: dict):
     [loyalty_response, reservation_response] = await asyncio.gather(get_loyalty(token), get_reservations(token))
 
     if is_response(reservation_response):
@@ -47,8 +47,13 @@ async def get_user_info(token: str):
             loyalty_response = {}
         else:
             return JSONResponse(status_code=status.HTTP_401_UNAUTHORIZED,
-                            content=schemas.ErrorResponse(message='Unauthorized').model_dump())
-    return schemas.UserInfoResponse(reservations=reservation_response, loyalty=loyalty_response)
+                                content=schemas.ErrorResponse(message='Unauthorized').model_dump())
+
+    profile = schemas.UserProfile(name=userinfo["first_name"],
+                                  surname=userinfo["last_name"],
+                                  patronymic=userinfo["patronymic"],
+                                  phoneNumber=userinfo["phone_number"])
+    return schemas.UserInfoResponse(profile=profile, reservations=reservation_response, loyalty=loyalty_response)
 
 
 async def get_reservations(token: str):
@@ -355,14 +360,31 @@ async def get_loyalty(token: str):
 async def register_user(request: Request):
     url = f"http://{settings['identity_serv_host']}:{settings['identity_serv_port']}{settings['prefix']}/register"
     data = await request.json()
-    return (await serviceRequests.post(url=url, headers=request.headers, data=data, params=request.query_params)).json()
+    res = (await serviceRequests.post(url=url, headers=request.headers, data=data, params=request.query_params))
+    return JSONResponse(status_code=res.status_code, content=dict(res.json()))
 
 
 async def auth_user(request: schemas.AuthenticationRequest):
     url = f"http://{settings['identity_serv_host']}:{settings['identity_serv_port']}{settings['prefix']}/oauth/token"
-    return (await serviceRequests.post(url=url, data=request.model_dump(mode='json'))).json()
+    res = (await serviceRequests.post(url=url, data=request.model_dump(mode='json')))
+    return JSONResponse(status_code=res.status_code, content=dict(res.json()))
 
 
 async def logout(request: Request):
     url = f"http://{settings['identity_serv_host']}:{settings['identity_serv_port']}{settings['prefix']}/oauth/revoke"
     return (await serviceRequests.post(url=url, headers=request.headers, params=request.query_params)).json()
+
+
+async def get_statistic(token: str):
+    url = f"http://{settings['statistic_serv_host']}:{settings['statistic_serv_port']}{settings['prefix']}/statistic/all"
+    return (await serviceRequests.get(url=url, headers={"Authorization": token})).json()
+
+
+async def get_service_avg(token: str):
+    url = f"http://{settings['statistic_serv_host']}:{settings['statistic_serv_port']}{settings['prefix']}/statistic/services/avg-time"
+    return (await serviceRequests.get(url=url, headers={"Authorization": token})).json()
+
+
+async def get_query_avg(token: str):
+    url = f"http://{settings['statistic_serv_host']}:{settings['statistic_serv_port']}{settings['prefix']}/statistic/queries/avg-time"
+    return (await serviceRequests.get(url=url, headers={"Authorization": token})).json()

@@ -71,12 +71,16 @@ ALTER TABLE ONLY public.hotels ALTER COLUMN id SET DEFAULT nextval('public.hotel
 --
 
 COPY public.hotels (id, hotel_uid, name, country, city, adress, stars, price) FROM stdin;
-1	049161bb-badd-4fa8-9d90-87c9a82b0668	Jomtien Garden Palace	Thailand	Pattaya	Jomtien st., 69	3	2599
-2	049161bb-badd-4fa8-9d90-87c9a82b0667	Lady Gaga Spa Resort	USA	Los Angeles	Hot Avenue, 28	4	5000
-3	049161bb-badd-4fa8-9d90-87c9a82b0666	Cortez Blood Resort	USA	NY	Taylor st., 69	3	3228
-4	049161bb-badd-4fa8-9d90-87c9a82b0665	Delphin Botanic Resort	Turkey	Alanya	Amy Derya st., 64	5	2500
-5	049161bb-badd-4fa8-9d90-87c9a82b0664	Delphin Premium Resort	Turkey	Alanya	Amy Derya st., 65	5	3500
-6	049161bb-badd-4fa8-9d90-87c9a82b0663	Delphin Platinum Resort	Turkey	Alanya	Amy Derya st., 66	5	5500
+1	049161bb-badd-4fa8-9d90-87c9a82b0668	South Shore Resort	USA	Salina	Victoria Heights Ter, 738	3	12500
+2	049161bb-badd-4fa8-9d90-87c9a82b0667	One-night stand	USA	Winfield	142nd Rd, 17382	4	34000
+3	049161bb-badd-4fa8-9d90-87c9a82b0666	Galactic Hotel	USA	El Dorado	Rr 5, 74	3	14000
+4	049161bb-badd-4fa8-9d90-87c9a82b0665	Blue Moon	USA	Silver Lake	NW 35th St., 8942	5	46000
+5	049161bb-badd-4fa8-9d90-87c9a82b0664	Olympus Hotel	USA	New Town	1806th Hwy E, 3911	5	72500
+6	049161bb-badd-4fa8-9d90-87c9a82b0663	Obsidian Sky	USA	Bismarck	Deer Valley Ln., 2131	5	55500
+7	99619f07-5e7e-42fa-bc25-7ba5df639534	Galactic Hotel	USA	Oakes	13th St N., 214	4	37200
+8	2e721544-6e53-4a55-aaed-d0ad048ccab8	Treebones Resort	USA	Ranger	Vitalious St., 1023	2	4900
+9	63ea23c8-04e8-43f3-a817-e77fac3bd78c	Obsidian Sky	USA	New Braunfels	Twin Oaks Dr., 891	5	52000
+10	910d222d-a88c-4617-8fb2-89fefde8ad99	The Park Lane	USA	Hemphill	Pontiac Dr., 2312	4	44000
 \.
 
 

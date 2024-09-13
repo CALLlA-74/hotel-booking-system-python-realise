@@ -56,8 +56,6 @@ jobs:
           script: |
             cd /home/${{ secrets.SSH_USER }}/kafka_service
             echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker-compose down
-            echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker rmi kafka
-            echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker rmi zookeeper
             echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker-compose build
             echo ${{ secrets.SSH_PASSWORD }} | sudo -S docker-compose up -d
   

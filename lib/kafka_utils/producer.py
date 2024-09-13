@@ -8,7 +8,7 @@ from schemas.dto import EventInfoMsg
 
 class KafkaProducer:
     KAFKA_TOPIC = "booking.statistic.events.topic"
-    KAFKA_BOOTSTRAP_SERVERS = "kafka:29092"
+    KAFKA_BOOTSTRAP_SERVERS = "84.201.146.37:9092"
     __background_tasks = set()
 
     @staticmethod

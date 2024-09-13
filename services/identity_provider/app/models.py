@@ -128,7 +128,7 @@ class JWK(Base):
 
 
 class IssuedJWTToken(Base):
-    __tablename__ = 'issuedJWTTokens'
+    __tablename__ = 'issuedjwttokens'
     __table_args__ = {
         'extend_existing': True
     }

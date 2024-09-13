@@ -25,7 +25,7 @@ SET default_table_access_method = heap;
 --
 
 CREATE TABLE public.users (
-    id integer PRIMARY KEY,
+    id serial PRIMARY KEY,
 	username varchar(80) NOT NULL UNIQUE,
 	password_hash varchar NOT NULL,
 	role varchar(80) NOT NULL CHECK (role IN ('user', 'admin')),

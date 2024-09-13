@@ -43,7 +43,9 @@ class User(Base):
         self.__email = email
 
     @staticmethod
-    def __gen_password_hash(password: str, salt: bytes = os.urandom(16)) -> str:
+    def __gen_password_hash(password: str, salt: bytes = None) -> str:
+        if not salt:
+            salt = os.urandom(16)
         password_hash = hashlib.pbkdf2_hmac(
             hash_name='sha256',
             password=password.encode('utf-8'),

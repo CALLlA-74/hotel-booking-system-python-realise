@@ -27,3 +27,4 @@ okta_jwt_verifier
 jwcrypto
 python-multipart
 aiokafka==0.8.0
+python-jose==3.3.0

@@ -5,7 +5,7 @@ from fastapi.requests import Request
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import HTTPException
 from database.AppDatabase import AppDatabase
-from routers import router as LoyaltyRouter
+from routers import router as IdentityRouter
 from config.config import get_settings
 
 

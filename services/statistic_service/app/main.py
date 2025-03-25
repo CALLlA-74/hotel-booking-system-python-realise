@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 from database.AppDatabase import AppDatabase
 from sqlalchemy.orm import Session
-from routers import router as LoyaltyRouter
+from routers import router as StatisticRouter
 from config.config import get_settings
 import asyncio
 
@@ -44,7 +44,7 @@ app = FastAPI(title="OpenAPI definition",
                   {"url": f"http://{settings['external_ip']}:{settings['port']}"}
               ]
               )
-app.include_router(LoyaltyRouter, prefix='')
+app.include_router(StatisticRouter, prefix='')
 app.openapi = get_openapi_schema
 app_db = AppDatabase.app_db
 

@@ -1,7 +1,7 @@
 from yaml import safe_load
 
 
-def get_settings(config_file_name: str = "./app/config/config.yaml", service_config_name: str = 'loyalty_app'):
+def get_settings(config_file_name: str = "./app/config/config.yaml", service_config_name: str = 'statistic_app'):
     with open(config_file_name) as file:
         data = safe_load(file)
     return data[service_config_name]

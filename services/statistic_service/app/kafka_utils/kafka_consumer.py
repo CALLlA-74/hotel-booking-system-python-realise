@@ -1,21 +1,23 @@
 from aiokafka import AIOKafkaConsumer
+from config.config import get_kafka_settings
 from services import add_event_info
 from database.database import Database
 from schemas.dto import EventInfoDTO
 import asyncio
 import json
 
-KAFKA_TOPIC = "booking.statistic.events.topic"
-KAFKA_CONSUMER_GROUP = "group-id"
-KAFKA_BOOTSTRAP_SERVERS = "84.201.146.37:9092"     # "kafka:29092"     # 'kafka_utils:9092'
+kafka_config = get_kafka_settings()
+kafka_topic = kafka_config['topic'] # "booking.statistic.events.topic"
+kafka_consumer_group = kafka_config['consumer_group'] # "group-id"
+kafka_bootstrap_server = kafka_config['bootstrap_server']     # "kafka:29092"     # 'kafka_utils:9092'
 
 
 async def consume(app_db: Database):
     consumer = AIOKafkaConsumer(
-        KAFKA_TOPIC,
+        kafka_topic,
         loop=asyncio.get_event_loop(),
-        bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,
-        group_id=KAFKA_CONSUMER_GROUP
+        bootstrap_servers=kafka_bootstrap_server,
+        group_id=kafka_consumer_group
     )
     print("start consuming")
     await consumer.start()

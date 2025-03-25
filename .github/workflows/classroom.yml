@@ -76,8 +76,8 @@ jobs:
 
       - name: Docker Hub login
         env:
-          CRYANDEX_PASSWORD: ${{ secrets.CRYANDEX_PASSWORD }}
-        run: echo "$CRYANDEX_PASSWORD" | docker login -u oauth --password-stdin cr.yandex
+          CRYANDEX_TOKEN: ${{ secrets.CRYANDEX_TOKEN }}
+        run: echo "$CRYANDEX_TOKEN" | docker login -u oauth --password-stdin cr.yandex
 
       - name: Docker Publish
         run: docker compose push
@@ -106,9 +106,9 @@ jobs:
       
       - name: Deploy db
         run: |
-          echo ${{ secrets.CRYANDEX_PASSWORD }} | sudo cp ./services/reservation_service/sql/init_db.sql ./k8s/postgres-chart/reservations-init-db.sql |
-          echo ${{ secrets.CRYANDEX_PASSWORD }} | sudo cp ./services/loyalty_service/sql/init_db.sql ./k8s/postgres-chart/loyalties-init-db.sql |
-          echo ${{ secrets.CRYANDEX_PASSWORD }} | sudo cp ./services/identity_provider/sql/init_db.sql ./k8s/postgres-chart/users-init-db.sql |
+          echo ${{ secrets.CRYANDEX_TOKEN }} | sudo cp ./services/reservation_service/sql/init_db.sql ./k8s/postgres-chart/reservations-init-db.sql |
+          echo ${{ secrets.CRYANDEX_TOKEN }} | sudo cp ./services/loyalty_service/sql/init_db.sql ./k8s/postgres-chart/loyalties-init-db.sql |
+          echo ${{ secrets.CRYANDEX_TOKEN }} | sudo cp ./services/identity_provider/sql/init_db.sql ./k8s/postgres-chart/users-init-db.sql |
           helm --kubeconfig ./kube.config upgrade --install db ./k8s/postgres-chart
           
       - name: Deploy app

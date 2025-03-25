@@ -17,3 +17,7 @@ statistic_app:
   log_level: "info"
   reload: True
 
+kafka_config:
+  topic: "booking.statistic.events.topic"
+  consumer_group: "group-id"
+  bootstrap_server: "51.250.45.63:9092"

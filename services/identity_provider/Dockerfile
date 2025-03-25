@@ -6,7 +6,7 @@ COPY ./services/identity_provider/ /code
 COPY ./lib/utils /code/app
 COPY ./lib/custom_exceptions /code/app
 COPY ./lib/kafka_utils/ /code/app
-RUN python -m pip3.10 install -r requirements.txt
+RUN pip3.10 install -r requirements.txt
 
 EXPOSE 8090
 

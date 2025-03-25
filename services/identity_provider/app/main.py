@@ -43,7 +43,7 @@ app = FastAPI(title="OpenAPI definition",
                   {"url": f"http://{settings['external_ip']}:{settings['port']}"}
               ]
               )
-app.include_router(LoyaltyRouter, prefix='')
+app.include_router(IdentityRouter, prefix='')
 app.openapi = get_openapi_schema
 app_db = AppDatabase.app_db
 

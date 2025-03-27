@@ -5,13 +5,140 @@ info:
 servers:
   - url: http://localhost:8080
 paths:
+  /api/v1/register:
+    post:
+      summary: Зарегистироваться
+      tags:
+        - Gateway API
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterUserRequest"
+      responses:
+        "200":
+          description: Параметри авторизационной сессии
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+        "401":
+          description: Ошибка авторизации
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /api/v1/oauth/token:
+    post:
+      summary: Авторизоваться
+      tags:
+        - Gateway API
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthenticationRequest"
+      responses:
+        "200":
+          description: Параметри авторизационной сессии
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+        "401":
+          description: Ошибка авторизации
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    
+  /api/v1/oauth/revoke:
+    post:
+      summary: Завершить сессию
+      tags:
+        - Gateway API
+      security:
+        - bearerAuthRefresh: [ ]
+      responses:
+        "200":
+          description: Информация по действиям пользователей в системе
+        "401":
+          description: Недействительный refresh-токен
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    
+  /api/v1/statistic/all:
+    get:
+      summary: Получить информацию по действиям пользователей в системе
+      tags:
+        - Gateway API
+      security:
+        - bearerAuthAccess: [ ]
+      responses:
+        "200":
+          description: Информация по действиям пользователей в системе
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventInfoResponse"
+        "401":
+          description: Ошибка авторизации
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    
+  /api/v1/services/avg-time:
+    get:
+      summary: Получить статистику среднего времени отклика по сервисам
+      tags:
+        - Gateway API
+      security:
+        - bearerAuthAccess: [ ]
+      responses:
+        "200":
+          description: Статистика среднего времени отклика по сервисам
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceAvgTimeResponse"
+        "401":
+          description: Ошибка авторизации
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    
+  /api/v1/statistic/queries/avg-time:
+    get:
+      summary: Получить статистику среднего времени отклика по запросам
+      tags:
+        - Gateway API
+      security:
+        - bearerAuthAccess: [ ]
+      responses:
+        "200":
+          description: Статистика среднего времени отклика по запросам
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QueryAvgTimeResponse"
+        "401":
+          description: Ошибка авторизации
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  
   /api/v1/hotels:
     get:
       summary: Получить список отелей
       tags:
         - Gateway API
       security:
-        - bearerAuth: [ ]
+        - bearerAuthAccess: [ ]
       parameters:
         - name: page
           in: query
@@ -46,7 +173,7 @@ paths:
       tags:
         - Gateway API
       security:
-        - bearerAuth: [ ]
+        - bearerAuthAccess: [ ]
       responses:
         "200":
           description: Полная информация о пользователе
@@ -67,7 +194,7 @@ paths:
       tags:
         - Gateway API
       security:
-        - bearerAuth: [ ]
+        - bearerAuthAccess: [ ]
       responses:
         "200":
           description: Информация по всем билетам
@@ -89,7 +216,7 @@ paths:
       tags:
         - Gateway API
       security:
-        - bearerAuth: [ ]
+        - bearerAuthAccess: [ ]
       requestBody:
         content:
           application/json:
@@ -121,7 +248,7 @@ paths:
       tags:
         - Gateway API
       security:
-        - bearerAuth: [ ]
+        - bearerAuthAccess: [ ]
       parameters:
         - name: reservationUid
           in: path
@@ -155,7 +282,7 @@ paths:
       tags:
         - Gateway API
       security:
-        - bearerAuth: [ ]
+        - bearerAuthAccess: [ ]
       parameters:
         - name: reservationUid
           in: path
@@ -186,7 +313,7 @@ paths:
       tags:
         - Gateway API
       security:
-        - bearerAuth: [ ]
+        - bearerAuthAccess: [ ]
       responses:
         "200":
           description: Данные о бонусном счете
@@ -203,12 +330,136 @@ paths:
 
 components:
   securitySchemes:
-    bearerAuth:
+    bearerAuthAccess:
       type: http
       scheme: bearer
       bearerFormat: JWT
+      description: авторизация по access-токен
+    bearerAuthRefresh:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: авторизация по refresh-токен
 
   schemas:
+    RegisterUserRequest:
+      type: object
+      example:
+        {
+          "scope": "openid",
+          "username": "Test Max",
+          "password": "123456",
+          "first_name": "Max",
+          "last_name": "Test",
+          "patronymic": "",
+          phone_number: "88005553535",
+          "email": "test-max@tmall.ru"
+        }
+      properties:
+        scope: 
+          type: string
+          description: Область действия; отвечает за информацию, которая будет помещена в токен. 
+            openid -- будет содержаться только имя пользователя и роль
+            openid profile -- помимо вышеописанного будет ФИО, номер телефона
+          enum:
+              - openid
+              - openid profile
+        username: 
+          type: string
+          description: Имя пользователя. (используется при grant_type = password)
+        password: 
+          type: string
+          description: Пароль. (используется при grant_type = password)
+        first_name: 
+          type: string
+          description: Имя клиента
+        last_name: 
+          type: string
+          description: Фамилиия клиента
+        patronymic: 
+          type: string
+          description: Отчество клиента
+        phone_number: 
+          type: string
+          description: Номер телефона
+        email: 
+          type: string
+          description: Эл.почта
+      
+    AuthenticationRequest:
+      type: object
+      example:
+        {
+          "scope": "openid",
+          "grant_type": "password",
+          "username": "Test Max",
+          "password": "123456"
+        }
+      properties:
+        scope: 
+          type: string
+          description: область действия; отвечает за информацию, которая будет помещена в токен. 
+            openid -- будет содержаться только имя пользователя и роль
+            openid profile -- помимо вышеописанного будет ФИО, номер телефона
+          enum:
+              - openid
+              - openid profile
+        grant_type: 
+          type: string
+          description: тип авторизации. (по логину и паролю или по refresh-токену)
+          enum:
+            - password
+            - refresh-token
+        username: 
+          type: string
+          description: имя пользователя. (используется при grant_type = password)
+        password: 
+          type: string
+          description: пароль. (используется при grant_type = password)
+        refresh_token:
+          type: string
+          format: bearer
+          bearerFormat: JWT
+          description: refresh-токен. используется при grant_type = refresh-token)
+    
+    TokenResponse:
+      type: object
+      example:
+        {
+          "refresh_token": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjZhMmVjMmU1LTRlOWEtNGRkYi1iMmEzLTE3YTc1Y2ZjODE3MCIsInRva2VuX3R5cGUiOiJyZWZyZXNoLXRva2VuIiwidHlwIjoiSldUIn0.eyJqdGkiOiIwNGQxZmNkMi02YjE4LTQ2OTktODZlMC1lZGNiNDViMTRmNTYiLCJpc3MiOiJodHRwOi8vaWRlbnRpdHktcHJvdmlkZXI6ODA5MC8iLCJpYXQiOjE3NDMxMTQ2ODAsImV4cCI6MTc0MzIwMTA4MCwiZGV2aWNlX2lkIjoiZWI2OTFkZmMtMDczMy00OWMwLWE0YTAtMGJkNTQyNTIxZDdkIn0.GEI_7BXaXRz_Kc9cSIrmH2q6FNiAFzrbZrEU7TEkQOLE6By6oLztv0ap8kCipfiRNj5FvtJtj9AeKASrJmSjjTdlvSmpy-3Ueck_4hwa_plSgQUZtReW5JKGFM_aJlKRTklcqyB6etaFE2g9WxzhA2L3PGClPP8tbPgfykysWd3IMA30XDyMnwdDiJBGvbEmftsyC2mcgIgesHyJ8AJddBzRZF2NacGXCuQjvmki9xbSepzg-AN7wx3uAovyrrBTj1qWjKcyKdUQpWDYFSyE3SbTrUvGXMnAzqPSGPTQc70ebU2dv2xOrfgBEE67bk-K-b9dydkN9Am485kNIOgnGg",
+          "access_token": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjI5ODU3ZGFhLWVhZjctNDczOS1hZWUwLTdlZTdlYTMxYjVmNCIsInRva2VuX3R5cGUiOiJhY2Nlc3MtdG9rZW4iLCJ0eXAiOiJKV1QifQ.eyJqdGkiOiIzOTAyZjUzYS01NWQwLTRiNzMtODRkOC1iNDE2MzE0NDMyOWMiLCJ1c2VybmFtZSI6IlRlc3QgTWF4Iiwicm9sZSI6InVzZXIiLCJmaXJzdF9uYW1lIjoiIiwibGFzdF9uYW1lIjoiIiwicGF0cm9ueW1pYyI6IiIsInBob25lX251bWJlciI6IiIsImVtYWlsIjoiIiwiaXNzIjoiaHR0cDovL2lkZW50aXR5LXByb3ZpZGVyOjgwOTAvIiwiaWF0IjoxNzQzMTE0NjgwLCJleHAiOjE3NDMxMTQ5ODAsImRldmljZV9pZCI6ImViNjkxZGZjLTA3MzMtNDljMC1hNGEwLTBiZDU0MjUyMWQ3ZCJ9.QGHvbS5NPS-iWkWpmU2JX4MEZ3eGll0ttiKRvDN31jKcuEflDgLdsM_QWQbb0DUYW6a-pkalwppDln-hBFt_tgJ4OMxAXMx_OZgLqdtXQ_RAvJ-boHKh-XTq_nSoDarTyCAjlfkFob6OeDZOF1mbLyR4YK37vNG_m5Pl3DRJBeTVuC6FcAoFfk3v0Z2EPthhils8MBtjF-drfzuatf1dCiS4lexdMH8yZMZbBH-ZwMlQ3AeHR30czfrHqw33XLDopTXXx1m61F7o2LmAw_gDCosC7Xv3KBHEj2pMDwPt69DKZg9VOeVSsUckrvaDVlFHHBnQF-owzmklRoM0kTZeDg",
+          "scope": "openid",
+          "expires_in": 1743114980,
+          "token_type": "Bearer"
+        }
+      properties:
+        refresh_token: 
+          type: string
+          format: bearer
+          bearerFormat: JWT
+          description: refresh-токен
+        access_token: 
+          type: string
+          format: bearer
+          bearerFormat: JWT
+          description: access-токен
+        scope:
+          type: string
+          description: область действия; отвечает за информацию, которая будет помещена в токен. 
+            openid -- будет содержаться только имя пользователя и роль
+            openid profile -- помимо вышеописанного будет ФИО, номер телефона
+          enum:
+            - openid
+            - openid profile
+        expires_in: 
+          type: integer
+          format: unix-time
+          description: время экспирации access-токена
+        token_type: 
+          type: string
+          enum: 
+            - Bearer
+  
     PaginationResponse:
       type: object
       example:
@@ -490,6 +741,82 @@ components:
         reservationCount:
           type: number
           description: Количество бронирований
+    
+    EventInfoResponse:
+      type: object
+      example:
+        {
+          "eventUuid": "049161bb-badd-4fa8-9d90-87c9a82b0668",
+          "username": "Test Max",
+          "eventAction": "hotel_by_uuid",
+          "startTime": "2025-03-25 23:32:16.803425",
+          "endTime": "2025-03-25 23:32:16.823277",
+          "serviceName": "Reservation Service"
+        }
+      properties:
+        eventUuid: 
+          type: string
+          format: uuid
+          description: UUID запроса
+        username: 
+          type: string
+          description: Имя пользователя, отправившего запрос
+        eventAction: 
+          type: string
+          description: Наименование запроса
+        startTime: 
+          type: string
+          format: ISO 8601
+          description: время начала обработки запроса в UTC
+        endTime: 
+          type: string
+          format: ISO 8601
+          description: время завершения обработки запроса в UTC
+        serviceName: 
+          type: string
+          description: Название сервиса
+        
+    ServiceAvgTimeResponse:
+      type: object
+      example:
+        {
+          "serviceName": "Reservation Service",
+          "num": 100,
+          "avgTime": 75.25
+        }
+      properties:
+        serviceName: 
+          type: string
+          description: Название сервиса
+        num: 
+          type: integer
+          description: количество запросов
+        avgTime: 
+          type: float
+          description: Среднее время обработки запросов
+    
+    QueryAvgTimeResponse:
+      type: object
+      example:
+        {
+          "serviceName": "Reservation Service",
+          "eventAction": "hotel_by_uuid",
+          "num": 10,
+          "avgTime": 25.4
+        }
+      properties:
+        serviceName: 
+          type: string
+          description: Название сервиса
+        eventAction: 
+          type: string
+          description: Наименование запроса
+        num: 
+          type: integer
+          description: количество запросов
+        avgTime: 
+          type: float
+          description: Среднее время обработки запросов
 
     ErrorDescription:
       type: object
